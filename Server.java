@@ -8,6 +8,8 @@ public class Server
     private Socket          socket   = null; 
     private ServerSocket    server   = null; 
     private DataInputStream in       =  null; 
+
+    private HashMap<String, ClientSocket> ClientList = null;
   
     // constructor with port 
     public Server(int port) 
@@ -22,13 +24,14 @@ public class Server
 				System.out.println("Waiting for a client ..."); 
   
 				socket = server.accept();
+                ClientSocket client = new ClientSocket(socket);
 				InetAddress addr = socket.getInetAddress();
 				System.out.println("Client accepted From " 
 									+ addr.getHostName() + " (" 
 									+ addr.getHostAddress() + ")"); 
 	  
 				// takes input from the client socket 
-				(new Thread(new ConnectionHandler(socket))).start();
+				(new Thread(new ConnectionHandler(client, this))).start();
 			}
             
             /* 
@@ -62,6 +65,19 @@ public class Server
             System.out.println(i); 
         } 
     } 
+
+    public boolean addClient(ClientSocket client) {
+        this.ClientList.put(client.username, client);
+        return true;
+    }
+
+    public boolean removeClient(String username) {
+        if(this.ClientList.containsKey(username)) {
+            this.ClientList.remove(username);
+            return true;
+        }
+        return false;
+    }
   
     public static void main(String args[]) 
     { 
