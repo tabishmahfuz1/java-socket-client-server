@@ -1,6 +1,9 @@
 import java.net.*; 
 import java.io.*; 
 
+/**
+* Connection Handler Thread for individual Client Connections
+*/
 class ConnectionHandler implements Runnable {
 	private final Socket clientSocket;
 	private DataInputStream in; 
@@ -13,21 +16,27 @@ class ConnectionHandler implements Runnable {
 		this.mainServer 	= server;
 		this.inputStream 	= clientSocket.getInputStream();
 		this.outputStream 	= clientSocket.getOutputStream(); 
-
 	}
 	
 	public void run(){
 		try {
-			
+			// Start Listening from the Client
 			this.listen();
 
-			System.out.println("Closing connection from " + clientSocket.socket.getInetAddress().getHostAddress()); 
+			System.out.println("Closing connection from " 
+				+ clientSocket.socket.getInetAddress().getHostAddress()); 
+
+			// Close the Client Connection
 			this.closeConnection();
 		} catch(IOException ex) {
 			System.out.println(ex);
 		}
     }
 
+    /**
+    * Initialises Client Connection
+    * @return boolean
+    */
     public void initializeClient() {
     	String nextline;
 
@@ -49,6 +58,10 @@ class ConnectionHandler implements Runnable {
 		return true;
     }
 
+    /**
+    * Listens and handles Incoming Messages from the Client
+    *
+    */
     public void listen() {
     	if(!this.initializeClient()) {
     		return false;
@@ -61,6 +74,10 @@ class ConnectionHandler implements Runnable {
 		} 
     }
 
+    /**
+    * Closes the Client Connection
+    *
+    */
     public void closeConnection() {
     	this.clientSocket.socket.close();
 		this.mainServer.removeClient(this.clientSocket.username);
