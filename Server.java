@@ -1,6 +1,7 @@
 // A Java program for a Server 
 import java.net.*; 
-import java.io.*; 
+import java.io.*;
+import java.util.HashMap; 
 
 public class Server 
 { 
@@ -9,7 +10,7 @@ public class Server
     private ServerSocket    server   = null; 
     private DataInputStream in       =  null; 
 
-    private HashMap<String, ClientSocket> ClientList = null;
+    private HashMap<String, ClientSocket> ClientList = new HashMap<String,ClientSocket>();
   
     public Server(int port) 
     { 
@@ -67,12 +68,8 @@ public class Server
     * Returns List of Client Connected to the server
     * @return HashMap<String, ClientSocket>
     */
-    public boolean getClients() {
-        if(this.ClientList.containsKey(username)) {
-            this.ClientList.remove(username);
-            return true;
-        }
-        return false;
+    public HashMap<String, ClientSocket> getClients() {
+        return this.ClientList;
     }
   
     public static void main(String args[]) 

@@ -5,57 +5,52 @@ import java.io.*;
 * Connection Handler Thread for individual Client Connections
 */
 class ConnectionHandler implements Runnable {
-	private final Socket clientSocket;
-	private DataInputStream in; 
+	private final ClientSocket clientSocket;
 	private Server mainServer;
-	private DataInputStream inputStream;
-	private DataOutputStream outputStream;
 	
-	public ConnectionHandler(Socket clientSocket, Server server){
+	public ConnectionHandler(ClientSocket clientSocket, Server server){
 		this.clientSocket 	= clientSocket;
 		this.mainServer 	= server;
-		this.inputStream 	= clientSocket.getInputStream();
-		this.outputStream 	= clientSocket.getOutputStream(); 
 	}
 	
 	public void run(){
-		try {
-			// Start Listening from the Client
-			this.listen();
+		// Start Listening from the Client
+		this.listen();
 
-			System.out.println("Closing connection from " 
-				+ clientSocket.socket.getInetAddress().getHostAddress()); 
+		System.out.println("Closing connection from " 
+			+ clientSocket.getBaseSocket().getInetAddress().getHostAddress()); 
 
-			// Close the Client Connection
-			this.closeConnection();
-		} catch(IOException ex) {
-			System.out.println(ex);
-		}
+		// Close the Client Connection
+		this.closeConnection();
     }
 
     /**
     * Initialises Client Connection
     * @return boolean
     */
-    public void initializeClient() {
+    public boolean initializeClient() {
     	String nextline;
+    	try {
+    		this.clientSocket.write("Enter Your Username: ");
+			nextline = this.clientSocket.read();
 
-		outputStream.write("Enter Your Username: ");
-		nextline = inputStream.readUTF();
+			// TODO: Check duplicate Username
 
-		// TODO: Check duplicate Username
+			this.clientSocket.setUsername(nextline);
 
-		this.clientSocket.setUsername(nextline);
-
-		if(this.mainServer.addClient(this.clientSocket)) {
-			outputStream.write("Welcome to the chatroom!\n");
-			return true;
-		} else {
-			outputStream.write("Couldn't initialize your connection. Please try again");	
-			this.closeConnection();
-			return false;
-		}
-		return true;
+			if(this.mainServer.addClient(this.clientSocket)) {
+				this.clientSocket.write("Welcome to the chatroom!\n");
+				return true;
+			} else {
+				this.clientSocket.write("Couldn't initialize your connection. Please try again");	
+				this.closeConnection();
+				return false;
+			}
+    	} catch (IOException ex) {
+    		System.out.println(ex);
+    		return false;
+    	}
+		
     }
 
     /**
@@ -64,14 +59,20 @@ class ConnectionHandler implements Runnable {
     */
     public void listen() {
     	if(!this.initializeClient()) {
-    		return false;
+    		return;
     	}
-
-		while (!(nextline = inputStream.readUTF()).equals("Over")) 
-		{ 
-			// nextline = in.readUTF(); 
-			System.out.println(nextline); 
-		} 
+    	String nextline;
+    	try {
+    		while (!(nextline = this.clientSocket.read()).equals("Over")) 
+			{ 
+				// nextline = in.readUTF(); 
+				System.out.println(nextline); 
+			} 
+    	} catch (IOException ex) {
+    		System.out.println(ex);
+    		return;
+    	}
+		
     }
 
     /**
@@ -79,7 +80,7 @@ class ConnectionHandler implements Runnable {
     *
     */
     public void closeConnection() {
-    	this.clientSocket.socket.close();
+    	this.clientSocket.close();
 		this.mainServer.removeClient(this.clientSocket.username);
     }
 }
