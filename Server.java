@@ -45,8 +45,10 @@ public class Server
     * @param client ClientSocket The connection to add to the list
     * @return boolean
     */
-    public boolean addClient(ClientSocket client) {
+    public boolean addClient(ClientSocket client) throws IOException {
         this.ClientList.put(client.username, client);
+        client.write("Connection Successful");
+        System.out.println("New User Added to Client list: " + client.username);
         return true;
     }
 

@@ -61,18 +61,28 @@ class ConnectionHandler implements Runnable {
     	if(!this.initializeClient()) {
     		return;
     	}
-    	String nextline;
+    	String msg;
     	try {
-    		while (!(nextline = this.clientSocket.read()).equals("Over")) 
+    		while (!(msg = this.clientSocket.read()).equals("Over")) 
 			{ 
 				// nextline = in.readUTF(); 
-				System.out.println(nextline); 
+				System.out.println(this.clientSocket.username + " => " + msg);
+				this.broadcastMsg(this.clientSocket.username, msg);
 			} 
     	} catch (IOException ex) {
     		System.out.println(ex);
     		return;
     	}
 		
+    }
+
+    public void broadcastMsg(String username, String msg) {
+    	for (Map.Entry<String, ClientSocket> client 
+    			: mainServer.getClients.entrySet()) {
+		    if(client.getKey().equals(username))
+		    	continue;
+		    client.write(msg);
+		}
     }
 
     /**

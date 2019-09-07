@@ -4,11 +4,14 @@ import java.io.*;
   
 public class Client 
 { 
+    public static final int SOCKET          = 2;
+    public static final int TERMINAL        = 1;
     // initialize socket and input output streams 
     private Socket socket                   = null; 
-    private DataInputStream  input          = null; 
-    private DataInputStream  serverinput    = null; 
-    private DataOutputStream out            = null; 
+    private String username                 = null; 
+    private DataInputStream  socketInput    = null; 
+    private DataInputStream  terminalInput  = null; 
+    private DataOutputStream socketOutput   = null; 
   
     // constructor to put ip address and port 
     public Client(String address, int port) 
@@ -20,13 +23,13 @@ public class Client
             System.out.println("Connected"); 
   
             // takes input from terminal 
-            input           = new DataInputStream(System.in); 
+            terminalInput   = new DataInputStream(System.in); 
 
             // takes input from the socket 
-            inputServer     = new DataInputStream(socket.getInputStream()); 
+            socketInput     = new DataInputStream(socket.getInputStream()); 
   
             // sends output to the socket 
-            out             = new DataOutputStream(socket.getOutputStream()); 
+            socketOutput             = new DataOutputStream(socket.getOutputStream()); 
         } 
         catch(UnknownHostException u) 
         { 
@@ -35,37 +38,84 @@ public class Client
         catch(IOException i) 
         { 
             System.out.println(i); 
-        } 
-  
-        // string to read message from input 
-        String line = ""; 
-  
-        // keep reading until "Over" is input 
+        }
+
+        // Read and Set Username
+        try{  
+            System.out.println("=> " + socketInput.readUTF()); 
+            this.setUsername(terminalInput.readLine());
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        new Thread(() -> listenSocket()).start();    
+        new Thread(() -> listenTerminal()).start();    
+        // listenTerminal();    
+    }
+
+    public void listenSocket() {
+        String line = "";
+        System.out.println("Listening from Socket");
         while (!line.equals("Over")) 
         { 
             try
             { 
-                line = input.readLine(); 
-                out.writeUTF(line); 
+                line = socketInput.readUTF(); 
+                System.out.println("=> " + line); 
             } 
             catch(IOException i) 
             { 
                 System.out.println(i); 
+                closeConnection();
+                break;
             } 
-        } 
-  
-        // close the connection 
-        try
+        }
+    }
+
+    public void listenTerminal() {
+        String line = "";
+        // keep reading until "Over" is input 
+        System.out.println("Listening from Terminal");
+        while (!line.equals("Over")) 
         { 
-            input.close(); 
-            out.close(); 
-            socket.close(); 
+            try
+            { 
+                line = terminalInput.readLine(); 
+                socketOutput.writeUTF(line); 
+            } 
+            catch(IOException i) 
+            { 
+                System.out.println(i); 
+                break;
+            } 
+        }
+        closeConnection();
+    }
+
+    public DataInputStream getInputStream(int inputType) {
+        if(inputType == TERMINAL) {
+            return this.terminalInput;
+        } else {
+            return this.socketInput;
+        }
+    }
+
+    public DataOutputStream getOutputStream() {
+        return this.socketOutput;
+    }
+
+    public boolean setUsername(String username) throws IOException{
+        socketOutput.writeUTF(username);
+        if(socketInput.readUTF().equals("ADDED")) {
+            this.username = username;
+            System.out.println("ADDED");
+            return true;
         } 
-        catch(IOException i) 
-        { 
-            System.out.println(i); 
-        } 
-    } 
+        return false;
+    }
+
+    public Socket getBaseSocket() {
+        return socket;
+    }
   
     public static void main(String args[]) 
     { 
@@ -81,4 +131,18 @@ public class Client
 		 
         Client client = new Client(serverAddress, port); 
     } 
+
+    public void closeConnection(){
+        // close the connection 
+        try
+        { 
+            terminalInput.close(); 
+            socketOutput.close(); 
+            socket.close(); 
+        } 
+        catch(IOException i) 
+        { 
+            System.out.println(i); 
+        } 
+    }
 } 

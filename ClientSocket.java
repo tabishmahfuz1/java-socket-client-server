@@ -24,8 +24,9 @@ class ClientSocket {
 	* @param message String
 	* @return void
 	*/
-	public void write(String message) {
-		outputStream.writeUTF(message);
+	public void write(String message) throws IOException {
+		outStream.writeUTF(message);
+		outStream.flush();
 	}
 
 	/**
@@ -81,6 +82,12 @@ class ClientSocket {
 	* @return void
 	*/
 	public void setUsername(String username) {
+		System.out.println("New Username Request: " + username);
 		this.username = username;
+		try {
+			this.write("ADDED");
+		} catch (IOException ex) {
+			System.out.println(ex);
+		}
 	}
 }
