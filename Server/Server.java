@@ -75,7 +75,11 @@ public class Server
     }
   
     public static void main(String args[]) 
-    { 
-        Server server = new Server(5000); 
+    {
+        int port                = 5000;
+        if(args.length > 0) {
+            port = Integer.parseInt(args[1]);
+        }
+        Server server = new Server(port); 
     } 
 } 
