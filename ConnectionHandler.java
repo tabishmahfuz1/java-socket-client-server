@@ -1,5 +1,7 @@
 import java.net.*; 
 import java.io.*; 
+import java.util.*; 
+
 
 /**
 * Connection Handler Thread for individual Client Connections
@@ -78,10 +80,14 @@ class ConnectionHandler implements Runnable {
 
     public void broadcastMsg(String username, String msg) {
     	for (Map.Entry<String, ClientSocket> client 
-    			: mainServer.getClients.entrySet()) {
+    			: mainServer.getClients().entrySet()) {
 		    if(client.getKey().equals(username))
 		    	continue;
-		    client.write(msg);
+		    try{
+			    client.getValue().write(username + ": " + msg);
+		    } catch (IOException ex) {
+		    	System.out.println(ex);
+		    }
 		}
     }
 
