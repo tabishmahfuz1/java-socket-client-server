@@ -8,14 +8,14 @@
 
 # Usage
 
-* <strong>Server</strong>
+      # <strong>Server</strong>
 * -> Goto Server Directory
 * -> Compile Server.java Class: javac Server.java
 * -> RUN: 
       java Server [PORT]
       
 
-* <strong>Client</strong>
+      # <strong>Client</strong>
 * -> Goto Client Directory
 * -> Compile Client.java Class: javac Client.java
 * -> RUN: 
