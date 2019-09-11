@@ -8,17 +8,17 @@
 
 # Usage
 
-* Server
-  -> Goto Server Directory
-  -> Compilr Server.java Class: javac Server.java
-  -> RUN: 
+* <strong>Server</strong>
+* -> Goto Server Directory
+* -> Compile Server.java Class: javac Server.java
+* -> RUN: 
       java Server [PORT]
       
 
-* Client
-  -> Goto Client Directory
-  -> Compile Client.java Class: javac Client.java
-  -> RUN: 
+* <strong>Client</strong>
+* -> Goto Client Directory
+* -> Compile Client.java Class: javac Client.java
+* -> RUN: 
       java Client [IP_ADDRESS] [PORT]
       
       
