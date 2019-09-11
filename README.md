@@ -6,16 +6,15 @@
 
 * <strong>ConnectionHandler:</strong> Handles individual client connections as a separate therad
 
-# Usage
 
-      # Server
+   # Server Usage
 * -> Goto Server Directory
 * -> Compile Server.java Class: javac Server.java
 * -> RUN: 
       java Server [PORT]
       
 
-      # Client
+   # Client Usage
 * -> Goto Client Directory
 * -> Compile Client.java Class: javac Client.java
 * -> RUN: 
